@@ -2,19 +2,17 @@ import Image from 'next/image';
 import type { SVGProps } from 'react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-interface LogoProps extends SVGProps<SVGSVGElement> {
+interface LogoProps extends React.ComponentPropsWithoutRef<typeof Image> {
   size?: number | string;
-  preserveAspectRatio?: string;
 }
 
 export function Logo({ 
   size, 
-  preserveAspectRatio = 'xMidYMid meet',
   width,
   height,
   className,
   ...props 
-}: LogoProps) {
+}: Omit<LogoProps, 'src' | 'alt'>) {
   // Use size prop if provided, otherwise fall back to width/height or default
   const finalWidth = size || width || 100;
   const finalHeight = size || height || 100;

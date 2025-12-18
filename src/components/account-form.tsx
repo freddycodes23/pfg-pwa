@@ -45,7 +45,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { Checkbox } from './ui/checkbox';
 import { ScrollArea } from './ui/scroll-area';
-import { useUser } from '@/firebase';
+import { useUser } from '@/components/supabase-provider';
 
 type Dependant = {
   id: number;
@@ -158,7 +158,7 @@ export function AccountManagementForm() {
     try {
         const pwaLink = window.location.origin;
         const { message } = await generateReferralMessageAction({
-            referrerName: user?.displayName || 'A friend',
+            referrerName: user?.user_metadata?.full_name || user?.email || 'A friend',
             recipientName: referralName,
             relationship: referralRelationship,
             pwaLink: pwaLink,
@@ -230,10 +230,10 @@ export function AccountManagementForm() {
         <CardHeader>
           <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16 text-xl">
-                  <AvatarFallback>{getInitials(user?.displayName || 'User')}</AvatarFallback>
+                  <AvatarFallback>{getInitials((user?.user_metadata?.full_name as string) || user?.email || 'User')}</AvatarFallback>
               </Avatar>
               <div>
-                <CardTitle>{user?.displayName || 'Valued Client'}</CardTitle>
+                <CardTitle>{(user?.user_metadata?.full_name as string) || user?.email || 'Valued Client'}</CardTitle>
                 <CardDescription>
                     Welcome to your account management center.
                 </CardDescription>
@@ -242,10 +242,10 @@ export function AccountManagementForm() {
         </CardHeader>
         <CardContent className="space-y-2">
             <h3 className="font-semibold mb-4">Personal Details</h3>
-            <DetailRow icon={User} label="Full Name" value={user?.displayName || 'N/A'} />
+            <DetailRow icon={User} label="Full Name" value={(user?.user_metadata?.full_name as string) || user?.email || 'N/A'} />
             <DetailRow icon={Users2} label="ID Number" value="9001015000080" />
             <DetailRow icon={AtSign} label="Email" value={user?.email || 'N/A'} />
-            <DetailRow icon={Phone} label="Phone Number" value={user?.phoneNumber || '+27 72 123 4567'} />
+            <DetailRow icon={Phone} label="Phone Number" value={(user?.phone ?? '') || '+27 72 123 4567'} />
             <DetailRow icon={Home} label="Physical Address" value="123 Sample Street, Pretoria, 0002" />
         </CardContent>
          <CardFooter className='flex-col items-start gap-4'>
@@ -267,7 +267,7 @@ export function AccountManagementForm() {
                             <CardContent className="space-y-6">
                                 <div className="flex items-center gap-4">
                                     <Avatar className="h-20 w-20">
-                                        <AvatarFallback>{getInitials(user?.displayName || "User")}</AvatarFallback>
+                                        <AvatarFallback>{getInitials((user?.user_metadata?.full_name as string) || user?.email || "User")}</AvatarFallback>
                                     </Avatar>
                                     <div className="flex items-center gap-2">
                                         <Label htmlFor="main-id-upload" className={cn(buttonVariants({ variant: 'outline' }), 'cursor-pointer')}>
@@ -281,7 +281,7 @@ export function AccountManagementForm() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="name-edit">Full Name</Label>
-                                        <Input id="name-edit" defaultValue={user?.displayName || ''} />
+                                        <Input id="name-edit" defaultValue={(user?.user_metadata?.full_name as string) || ''} />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="email-edit">Email (Optional)</Label>
@@ -292,7 +292,7 @@ export function AccountManagementForm() {
                                     <Label htmlFor="phone-edit">Phone Number</Label>
                                     <div className="flex items-center">
                                         <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-input bg-background text-sm text-muted-foreground">+27</span>
-                                        <Input id="phone-edit" type="tel" placeholder="72 123 4567" defaultValue={user?.phoneNumber?.substring(3) || ''} className="rounded-l-none" />
+                                        <Input id="phone-edit" type="tel" placeholder="72 123 4567" defaultValue={(user?.phone as string)?.substring(3) || ''} className="rounded-l-none" />
                                     </div>
                                 </div>
                                 <Separator />

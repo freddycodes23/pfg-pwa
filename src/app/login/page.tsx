@@ -15,19 +15,43 @@ import { Label } from "@/components/ui/label"
 import Image from "next/image"
 import { useToast } from "@/hooks/use-toast";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { useSupabase } from "@/components/supabase-provider";
+import { useState } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
+  const { supabase } = useSupabase();
+  const [isLoading, setIsLoading] = useState(false);
   const logoImage = PlaceHolderImages.find(p => p.id === 'pyramid-logo');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Login Successful",
-      description: "Welcome back!",
+    setIsLoading(true);
+    const formData = new FormData(e.target as HTMLFormElement);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
-    router.push("/dashboard");
+
+    setIsLoading(false);
+
+    if (error) {
+      toast({
+        title: "Login Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Login Successful",
+        description: "Welcome back!",
+      });
+      router.push("/dashboard");
+    }
   };
 
   return (
@@ -57,6 +81,7 @@ export default function LoginPage() {
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="m@example.com"
                 required
@@ -70,9 +95,11 @@ export default function LoginPage() {
                   Forgot your password?
                 </Link>
               </div>
-              <Input id="password" type="password" required defaultValue="password" />
+              <Input id="password" name="password" type="password" required defaultValue="password" />
             </div>
-            <Button type="submit" className="w-full">Login</Button>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Logging in..." : "Login"}
+            </Button>
           </form>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}

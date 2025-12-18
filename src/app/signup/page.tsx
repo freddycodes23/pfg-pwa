@@ -18,21 +18,65 @@ import { useToast } from "@/hooks/use-toast";
 import { Send, Loader2 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { useSupabase } from "@/components/supabase-provider";
 
 export default function SignupPage() {
     const router = useRouter();
     const { toast } = useToast();
+    const { supabase } = useSupabase();
+    const [isLoading, setIsLoading] = useState(false);
     const [isSendingOtp, setIsSendingOtp] = useState(false);
     const logoImage = PlaceHolderImages.find(p => p.id === 'pyramid-logo-square');
 
 
-    const handleSignup = (e: React.FormEvent) => {
+    const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
-        toast({
-            title: "Account Created",
-            description: "Your account has been successfully created. Please log in.",
+        setIsLoading(true);
+        const formData = new FormData(e.target as HTMLFormElement);
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
+        const fullName = formData.get("full-name") as string;
+        const phone = formData.get("phone") as string;
+
+        // Note: For phone auth, you need to configure an SMS provider in Supabase.
+        // Here we are using Email/Password signup.
+        
+        if (!email || !password) {
+             toast({
+                title: "Error",
+                description: "Email and Password are required for signup.",
+                variant: "destructive",
+            });
+            setIsLoading(false);
+            return;
+        }
+
+        const { error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name: fullName,
+                    phone: phone,
+                }
+            }
         });
-        router.push("/login");
+
+        setIsLoading(false);
+
+        if (error) {
+            toast({
+                title: "Signup Failed",
+                description: error.message,
+                variant: "destructive",
+            });
+        } else {
+            toast({
+                title: "Account Created",
+                description: "Your account has been successfully created. Please check your email for verification.",
+            });
+            router.push("/login");
+        }
     }
 
     const handleSendOtp = () => {
@@ -74,14 +118,16 @@ export default function SignupPage() {
           <form className="grid gap-4" onSubmit={handleSignup}>
             <div className="grid gap-2">
               <Label htmlFor="full-name">Full Name</Label>
-              <Input id="full-name" placeholder="John Doe" required />
+              <Input id="full-name" name="full-name" placeholder="John Doe" required />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="email">Email (Optional)</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="m@example.com"
+                required
               />
             </div>
             <div className="grid gap-2">
@@ -93,6 +139,7 @@ export default function SignupPage() {
                     </span>
                     <Input
                       id="phone"
+                      name="phone"
                       type="tel"
                       placeholder="72 123 4567"
                       required
@@ -110,15 +157,15 @@ export default function SignupPage() {
                 </div>
               </div>
              <div className="grid gap-2">
-              <Label htmlFor="otp">OTP</Label>
-              <Input id="otp" type="text" placeholder="Enter OTP" required />
+              <Label htmlFor="otp">OTP (Optional)</Label>
+              <Input id="otp" type="text" placeholder="Enter OTP" />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>              <Input id="password" type="password" required />
+              <Label htmlFor="password">Password</Label>              <Input id="password" name="password" type="password" required />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="confirm-password">Confirm Password</Label>
-              <Input id="confirm-password" type="password" required />
+              <Input id="confirm-password" name="confirm-password" type="password" required />
             </div>
             <div className="flex items-center space-x-2">
                 <Checkbox id="terms" required />
@@ -129,7 +176,9 @@ export default function SignupPage() {
                     </Link>
                 </Label>
             </div>
-            <Button type="submit" className="w-full">Create Account</Button>
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Creating Account..." : "Create Account"}
+            </Button>
           </form>
           <div className="mt-4 text-center text-sm">
             Already have an account?{" "}

@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { useUser } from '@/firebase';
+import { useUser } from '@/components/supabase-provider';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowUpRight, Coins, Compass, UserCog, LogOut } from 'lucide-react';
 import {
@@ -32,9 +32,10 @@ export default function DashboardPage() {
     if (isUserLoading) {
       return <Skeleton className="h-9 w-64" />;
     }
+    const displayName = user?.user_metadata?.full_name || user?.email;
     return (
       <h2 className="text-3xl font-bold tracking-tight font-headline">
-        Welcome Back{user?.displayName ? `, ${user.displayName}` : ''}
+        Welcome Back{displayName ? `, ${displayName}` : ''}
       </h2>
     );
   };
