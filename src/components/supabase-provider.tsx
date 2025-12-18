@@ -17,8 +17,12 @@ const SupabaseContext = createContext<SupabaseContextState | undefined>(undefine
 // Create the provider
 export const SupabaseProvider = ({ children }: { children: React.ReactNode }) => {
   const [supabase] = useState(() => {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+    const envUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const envKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    const supabaseUrl = (envUrl && envUrl.length > 0) ? envUrl : 'https://placeholder.supabase.co';
+    const supabaseAnonKey = (envKey && envKey.length > 0) ? envKey : 'placeholder-key';
+    
     return createClient(supabaseUrl, supabaseAnonKey);
   });
   const [user, setUser] = useState<User | null>(null);
