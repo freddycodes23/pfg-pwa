@@ -6,8 +6,10 @@ export type ImagePlaceholder = {
   imageHint: string;
 };
 
-// Direct embedding of the logo as a data URI to prevent all parsing errors.
-const logoDataUri = 'data:image/png;base64,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';
+// Images are in the public folder
+const logoUrl = '/pyramid-logo.png';
+const logoSquareUrl = '/pyramid-only.png';
+const nameplateUrl = '/pyramid-nameplate.png';
 
 export const PlaceHolderImages: ImagePlaceholder[] = [
     {
@@ -49,19 +51,19 @@ export const PlaceHolderImages: ImagePlaceholder[] = [
     {
       "id": "pyramid-logo",
       "description": "The logo for Pyramid Group Funerals.",
-      "imageUrl": logoDataUri,
+      "imageUrl": logoUrl,
       "imageHint": "company logo"
     },
     {
       "id": "pyramid-logo-square",
       "description": "The square logo for Pyramid Group Funerals.",
-      "imageUrl": logoDataUri,
+      "imageUrl": logoSquareUrl,
       "imageHint": "company logo"
     },
     {
       "id": "pyramid-nameplate",
       "description": "The nameplate logo for Pyramid Group Funerals.",
-      "imageUrl": logoDataUri,
+      "imageUrl": nameplateUrl,
       "imageHint": "company logo"
     }
   ]
