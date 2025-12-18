@@ -16,6 +16,7 @@ const nextConfig = {
   // Uncomment the following lines and replace 'repo-name' with your repository name.
   
   basePath: '/pfg-pwa',
+  assetPrefix: '/pfg-pwa/',
 };
 
 module.exports = nextConfig;

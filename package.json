@@ -7,8 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "predeploy": "npm run build && touch out/.nojekyll",
-    "deploy": "gh-pages -d out"
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d out --nojekyll"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.26.0",
