@@ -8,7 +8,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 export const metadata: Metadata = {
   title: 'Pyramid Group Funerals',
   description: 'The Name Says It All!!!',
-  manifest: '/manifest.json',
+  manifest: '/pfg-pwa/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
